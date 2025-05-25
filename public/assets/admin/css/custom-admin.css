@@ -1,0 +1,51 @@
+.custom-navbar {
+    background-color: #111827 !important; /* màu tối kiểu web phim */
+    color: #ffffff;
+}
+.custom-search-input {
+    background-color: #1f2937 !important; /* dark gray */
+    color: #f1f5f9 !important;            /* light text */
+    border: none !important;
+}
+
+.custom-search-input::placeholder {
+    color: #9ca3af; /* muted gray */
+}
+
+.custom-search-btn {
+    background-color: #e11d48 !important; /* crimson/red */
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.custom-search-btn:hover {
+    background-color: #be123c !important; /* darker red */
+}
+.custom-footer {
+    background-color: #1f2937; /* dark gray */
+    padding: 1rem 0;
+}
+/* Bạn có thể tùy chỉnh thêm CSS để có giao diện đẹp hơn */
+.table-bordered th {
+    background-color: #f8f9fa; /* Màu nền tiêu đề cột nhạt */
+    color: #4e73df; /* Màu chữ tiêu đề cột */
+    border-bottom: 2px solid #e3e6f0; /* Đường kẻ đậm hơn ở đáy tiêu đề */
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.table-bordered td {
+    padding: 0.75rem;
+    vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+}
+
+.table-bordered tbody tr:nth-child(even) {
+    background-color: #f8f9fa; /* Màu nền khác cho hàng chẵn (tùy chọn) */
+}
+
+.btn-sm {
+    margin-right: 5px;
+}
+.select2-container {
+    width: 100% !important;
+}
