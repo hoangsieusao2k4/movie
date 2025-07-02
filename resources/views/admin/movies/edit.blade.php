@@ -90,6 +90,22 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    <div class="mb-3" id="video_url_wrapper">
+                                        <label for="video_url" class="form-label">Video URL</label>
+                                        <input type="file" name="video_url" id="video_url" class="form-control">
+
+                                        @if ($movie->video_url)
+                                            <p class="mt-2">Đã có video:
+                                                <a href="{{ Storage::url($movie->video_url) }}" target="_blank">Xem video
+                                                    hiện tại</a>
+                                            </p>
+                                        @endif
+
+                                        @error('video_url')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
                                 </div>
 
                                 <!-- Cột phải -->
@@ -201,8 +217,27 @@
             $('.select2').select2({
                 placeholder: "Chọn diễn viên",
                 allowClear: true
+            });
 
+            function toggleVideoInput() {
+                const type = $('#type').val();
+                const hasVideo = {{ $movie->video_url ? 'true' : 'false' }};
+
+                if (type === 'series') {
+                    $('#video_url_wrapper').hide();
+                    $('#video_url').prop('required', false);
+                } else {
+                    $('#video_url_wrapper').show();
+                    $('#video_url').prop('required', !hasVideo);
+                }
+            }
+
+            toggleVideoInput();
+
+            $('#type').on('change', function() {
+                toggleVideoInput();
             });
         });
     </script>
+
 @endsection

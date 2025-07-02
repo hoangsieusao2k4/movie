@@ -7,7 +7,12 @@ use App\Http\Controllers\Admin\DirectorController;
 use App\Http\Controllers\Admin\EpisodeController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\MovieController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Client\CommentController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\VNPayController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\GoogleController;
 use App\Models\Director;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +26,47 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+// auth
+Route::get('/register', [AuthController::class, 'showRegister'])->name('showRegister');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 
-Route::get('/', [HomeController::class,'index'])->name('client.home');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('showLogin');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showFormEmail'])->name('password.email');
+Route::post('/forgot-password-email', [ForgotPasswordController::class, 'sendEmail'])->name('password.check-email');
+
+
+// Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
+
+Route::get('/check-otp', [ForgotPasswordController::class, 'showOtpForm'])->name('password.otp.form');
+Route::post('/check-otp', [ForgotPasswordController::class, 'checkOtp'])->name('check.otp');
+Route::get('/reset-password', [ForgotPasswordController::class, 'showReset'])->name('showReset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('check-reset');
+
+
+// google
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('/auth/callback/google', [GoogleController::class, 'handleGoogleCallback']);
+// client
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
+Route::get('/movies', [HomeController::class, 'genres'])->name('genres.index');
+Route::get('/phim-le', [HomeController::class, 'movie'])->name('client.movie');
+Route::get('/phim-bo', [HomeController::class, 'series'])->name('client.series');
+Route::get('/quoc-gia/{slug}', [HomeController::class, 'country'])->name('client.country');
+Route::get('/nam/{year}', [HomeController::class, 'year'])->name('client.year');
 Route::get('/movies/{slug}', [HomeController::class, 'show'])->name('client.show');
+Route::get('/watch/{slug}/{episode?}', [HomeController::class, 'watch'])->name('client.watch');
+// comment
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::get('/comments/{movie}', [CommentController::class, 'fetch'])->name('comments.fetch');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+
+//admin
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
     Route::get('/', function () {
         return view('admin.dashboard');
     });
@@ -94,4 +135,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('{country}/update', [CountryController::class, 'update'])->name('update');    // Cập nhật
         Route::delete('{country}/destroy', [CountryController::class, 'destroy'])->name('destroy'); // Xoá
     });
+    // routes/web.php
+
 });
+Route::middleware('auth')->group(function () {
+        Route::get('/premium', [VNPayController::class, 'form'])->name('premium.form');
+        Route::post('/payment/vnpay', [VNPayController::class, 'createPayment'])->name('vnpay.payment');
+        Route::get('/payment/vnpay/return', [VNPayController::class, 'handleReturn'])->name('vnpay.return');
+
+
+    });

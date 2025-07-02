@@ -157,7 +157,7 @@
 
                     <hr>
                     <h5 class="mt-4">Thêm tập mới</h5>
-                    <form action="{{ route('admin.episodes.store', $movie->id) }}" method="POST">
+                    <form action="{{ route('admin.episodes.store', $movie->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-row">
                             <div class="col-md-2">
@@ -168,7 +168,7 @@
                                 <input type="text" name="title" class="form-control" placeholder="Tiêu đề" required>
                             </div>
                             <div class="col-md-4">
-                                <input type="text" name="video_url" class="form-control" placeholder="Link video"
+                                <input type="file" name="video_url" class="form-control" 
                                     required>
                             </div>
                             <div class="col-md-2">

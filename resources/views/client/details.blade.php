@@ -21,7 +21,8 @@
             <div class="anime__details__content">
                 <div class="row">
                     <div class="col-lg-3">
-                        <div class="anime__details__pic set-bg" data-setbg="{{ Storage::url($movie->thumbnail) }}">
+                        <div class="anime__details__pic "
+                            style="background-image: url('{{ Storage::url($movie->thumbnail) }}');">
                             {{-- <div class="comment"><i class="fa fa-comments"></i> 11</div>
                             <div class="view"><i class="fa fa-eye"></i> 9141</div> --}}
                         </div>
@@ -98,8 +99,8 @@
                             </div>
                             <div class="anime__details__btn">
                                 <a href="#" class="follow-btn"><i class="fa fa-heart-o"></i> Follow</a>
-                                <a href="#" class="watch-btn"><span>Watch Now</span> <i
-                                        class="fa fa-angle-right"></i></a>
+                                <a href="{{ route('client.watch', $movie->slug) }}" class="watch-btn"><span>Watch Now</span>
+                                    <i class="fa fa-angle-right"></i></a>
                             </div>
 
                         </div>
@@ -111,8 +112,7 @@
                 <div class="anime__details__trailer" style="margin: 20px 0px;">
                     <div class="embed-responsive embed-responsive-16by9"
                         style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                        <iframe src="{{ preg_replace('/watch\\?v=([a-zA-Z0-9_-]+)/', 'embed/$1', $movie->trailer_url) }}"
-                            frameborder="0" allowfullscreen
+                        <iframe src="{{ getYoutubeEmbedUrl($movie->trailer_url) }}" frameborder="0" allowfullscreen
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
                         </iframe>
                     </div>
@@ -125,71 +125,28 @@
                         <div class="section-title">
                             <h5>Reviews</h5>
                         </div>
-                        <div class="anime__review__item">
-                            <div class="anime__review__item__pic">
-                                <img src="{{ asset('assets/client/img/anime/review-1.jpg') }}" alt="">
-                            </div>
-                            <div class="anime__review__item__text">
-                                <h6>Chris Curry - <span>1 Hour ago</span></h6>
-                                <p>whachikan Just noticed that someone categorized this as belonging to the genre
-                                    "demons" LOL</p>
-                            </div>
+                        <div id="commentList">
+                            @foreach ($movie->comments()->with('user')->latest()->get() as $comment)
+                                @include('client.components.comment-item', ['comment' => $comment])
+                            @endforeach
                         </div>
-                        <div class="anime__review__item">
-                            <div class="anime__review__item__pic">
-                                <img src="{{ asset('assets/client/img/anime/review-2.jpg') }}" alt="">
-                            </div>
-                            <div class="anime__review__item__text">
-                                <h6>Lewis Mann - <span>5 Hour ago</span></h6>
-                                <p>Finally it came out ages ago</p>
-                            </div>
-                        </div>
-                        <div class="anime__review__item">
-                            <div class="anime__review__item__pic">
-                                <img src="{{ asset('assets/client/img/anime/review-3.jpg') }}" alt="">
-                            </div>
-                            <div class="anime__review__item__text">
-                                <h6>Louis Tyler - <span>20 Hour ago</span></h6>
-                                <p>Where is the episode 15 ? Slow update! Tch</p>
-                            </div>
-                        </div>
-                        <div class="anime__review__item">
-                            <div class="anime__review__item__pic">
-                                <img src="{{ asset('assets/client/img/anime/review-4.jpg') }}" alt="">
-                            </div>
-                            <div class="anime__review__item__text">
-                                <h6>Chris Curry - <span>1 Hour ago</span></h6>
-                                <p>whachikan Just noticed that someone categorized this as belonging to the genre
-                                    "demons" LOL</p>
-                            </div>
-                        </div>
-                        <div class="anime__review__item">
-                            <div class="anime__review__item__pic">
-                                <img src="{{ asset('assets/client/img/anime/review-5.jpg') }}" alt="">
-                            </div>
-                            <div class="anime__review__item__text">
-                                <h6>Lewis Mann - <span>5 Hour ago</span></h6>
-                                <p>Finally it came out ages ago</p>
-                            </div>
-                        </div>
-                        <div class="anime__review__item">
-                            <div class="anime__review__item__pic">
-                                <img src="{{ asset('assets/client/img/anime/review-6.jpg') }}" alt="">
-                            </div>
-                            <div class="anime__review__item__text">
-                                <h6>Louis Tyler - <span>20 Hour ago</span></h6>
-                                <p>Where is the episode 15 ? Slow update! Tch</p>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="anime__details__form">
                         <div class="section-title">
                             <h5>Your Comment</h5>
                         </div>
-                        <form action="#">
-                            <textarea placeholder="Your Comment"></textarea>
-                            <button type="submit"><i class="fa fa-location-arrow"></i> Review</button>
-                        </form>
+                        @auth
+                            <form id="commentForm">
+                                @csrf
+                                <input type="hidden" name="movie_id" value="{{ $movie->id }}">
+                                <textarea name="content" placeholder="Your Comment" required></textarea>
+                                <button type="submit"><i class="fa fa-location-arrow"></i> Review</button>
+                            </form>
+                        @else
+                            <p>Bạn cần <a href="{{ route('showLogin') }}">đăng nhập</a> để bình luận.</p>
+                        @endauth
+
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
@@ -226,4 +183,23 @@
             </div>
         </div>
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $('#commentForm').submit(function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('comments.store') }}',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#commentList').prepend(response.html); // Chèn bình luận mới
+                    $('#commentForm')[0].reset(); // Xoá form
+                },
+                error: function() {
+                    alert("Có lỗi xảy ra. Vui lòng thử lại.");
+                }
+            });
+        });
+    </script>
 @endsection

@@ -39,7 +39,7 @@ class MovieController extends Controller
             'year' => 'required|integer|min:1900|max:' . date('Y'),
             // 'thumbnail' => 'nullable|string',
             'trailer_url' => 'nullable|url',
-            'video_url'=>'nullable|url',
+            'video_url' => 'nullable|file',
             'type' => 'required|in:movie,series',
             'is_premium' => 'boolean',
             'status' => 'required|in:public,private,draft',
@@ -56,11 +56,17 @@ class MovieController extends Controller
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('movies', 'public');
         }
-
+        $videoPath = null;
+        if ($request->hasFile('video_url')) {
+            $videoPath = $request->file('video_url')->store('movies/videos', 'public');
+        }
         // Tạo movie
         $movie = Movie::create(array_merge(
             $request->except(['genres', 'actors', 'thumbnail']),
-            ['thumbnail' => $thumbnailPath]
+            [
+                'thumbnail' => $thumbnailPath,
+                'video_url' => $videoPath,
+            ]
         ));
 
 
@@ -95,6 +101,7 @@ class MovieController extends Controller
             'description' => 'nullable|string',
             'year' => 'required|integer|min:1900|max:' . date('Y'),
             'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048', // tối đa 2MB
+            'video_url' => 'nullable|file', // tối đa 500MB
             'trailer_url' => 'nullable|url',
             'type' => 'required|in:movie,series',
             'is_premium' => 'boolean',
@@ -124,6 +131,14 @@ class MovieController extends Controller
 
             // Cập nhật đường dẫn ảnh trong DB (ví dụ: "movies/anh1.jpg")
             $data['thumbnail'] = 'movies/' . $fileName;
+        }
+        if ($request->hasFile('video_url')) {
+            if ($movie->video_url && Storage::exists($movie->video_url)) {
+                Storage::delete($movie->video_url);
+            }
+
+            $videoPath = $request->file('video_url')->store('movies/videos', 'public');
+            $data['video_url'] = $videoPath;
         }
 
 

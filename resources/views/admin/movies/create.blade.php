@@ -92,7 +92,7 @@
 
                                     <div class="form-group" id="video_url_field" style="display: none;">
                                         <label for="video_url">Video URL</label>
-                                        <input type="url" name="video_url" id="video_url" class="form-control" required>
+                                        <input type="file" name="video_url" id="video_url" class="form-control" required>
                                         <small class="form-text text-muted">Nhập URL video cho phim lẻ (ví dụ: YouTube, Vimeo,...).</small>
                                     </div>
                                 </div>

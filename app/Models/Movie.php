@@ -5,12 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+
 class Movie extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'title', 'slug', 'description', 'year', 'thumbnail', 'trailer_url',
-        'type', 'is_premium', 'status', 'country_id','director_id'
+        'title',
+        'slug',
+        'description',
+        'year',
+        'thumbnail',
+        'trailer_url',
+        'video_url',
+        'type',
+        'is_premium',
+        'status',
+        'country_id',
+        'director_id'
     ];
 
     protected $casts = [
@@ -47,5 +58,8 @@ class Movie extends Model
     {
         return $this->hasMany(Episode::class);
     }
-
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

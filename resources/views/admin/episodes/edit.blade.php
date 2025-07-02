@@ -19,7 +19,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Thông tin tập phim</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.episodes.update', $episode->id) }}" method="POST">
+                    <form action="{{ route('admin.episodes.update', $episode->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method("PUT")
 
@@ -44,10 +44,17 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="video_url" class="form-label">Link video</label>
-                            <input type="url" name="video_url" id="video_url"
+                            <label for="video_url" class="form-label"> Video</label>
+                            <input type="file" name="video_url" id="video_url"
                                    class="form-control @error('video_url') is-invalid @enderror"
-                                   value="{{ old('video_url', $episode->video_url) }}" required>
+                                   value="{{ old('video_url', $episode->video_url) }}" >
+                                    @if ($episode->video_url)
+                                            <p class="mt-2">Đã có video:
+                                                <a href="{{ Storage::url($episode->video_url) }}" target="_blank">Xem video
+                                                    hiện tại</a>
+                                            </p>
+                                        @endif
+
                             @error('video_url')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

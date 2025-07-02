@@ -36,6 +36,7 @@
     --------------------*/
     $('.set-bg').each(function () {
         var bg = $(this).data('setbg');
+        console.log('Set background for:', $(this), 'with URL:', bg);
         $(this).css('background-image', 'url(' + bg + ')');
     });
 
