@@ -5,7 +5,7 @@
                    <div class="header__logo">
                        <a href="{{ route('client.home') }}">
                            <img src="{{ asset('assets/client/img/ChatGPT Image 15_59_04 19 thg 6, 2025.png') }}"
-                               alt="">
+                             width="300px"  alt="">
                        </a>
                    </div>
                </div>
